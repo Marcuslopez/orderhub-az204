@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: read #This is required for actions/checkout
 
     steps:
       - uses: actions/checkout@v4
@@ -24,7 +24,6 @@ jobs:
           node-version: '20.x'
 
       - name: npm install, build, and test
-        working-directory: src/api
         run: |
           npm install
           npm run build --if-present
@@ -34,7 +33,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: src/api
+          path: .
 
   deploy:
     runs-on: ubuntu-latest
@@ -45,13 +44,12 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: node-app
-          path: .
-
-      - name: Deploy to Azure Web App
+      
+      - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'app-orderhub-api-mramos'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F0961D4B1BDD47B8BC9D1EF29F4A23DD }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_0B72EC97D0044277BC2C42EFF5392749 }}
