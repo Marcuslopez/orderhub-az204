@@ -24,6 +24,14 @@ Order { const newOrder: Order = { id: Date.now().toString(),
      this.orders.push(newOrder); 
      return newOrder; 
     }
-
+    
+remove(id: string) {
+  const index = this.orders.findIndex(o => o.id === id);
+  if (index === -1) {
+    throw new Error('Order not found');
+  }
+  this.orders.splice(index, 1);
+  return { deleted: true };
+}
 
 }
