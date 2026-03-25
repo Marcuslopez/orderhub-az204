@@ -30,12 +30,77 @@ function App() {
     }
   };
   useEffect(() => { fetchHealth(); fetchOrders(); }, []);
+
+  //Estilo de la grilla
+  const cellHeader: React.CSSProperties = {
+    border: '1px solid #ddd',
+    padding: '8px',
+    textAlign: 'left',
+    fontWeight: 'bold',
+  };
+
+  const cell: React.CSSProperties = {
+    border: '1px solid #ddd',
+    padding: '8px',
+  };
+
   return (
     <div style={{ padding: '2rem', fontFamily: 'Arial' }}>
+      <h1>OrderHub UI</h1>
+
+      <p>
+        <strong>Health:</strong> {health}
+      </p>
+
+      <button onClick={fetchOrders} style={{ marginBottom: '1rem' }}>
+        Refresh Orders
+      </button>
+
+      <table
+        style={{
+          width: '100%',
+          borderCollapse: 'collapse',
+          marginTop: '1rem',
+        }}
+      >
+        <thead>
+          <tr style={{ backgroundColor: '#f4f4f4' }}>
+            <th style={cellHeader}>ID</th>
+            <th style={cellHeader}>Customer</th>
+            <th style={cellHeader}>Total</th>
+            <th style={cellHeader}>Status</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {orders.map((order) => (
+            <tr key={order.id}>
+              <td style={cell}>{order.id}</td>
+              <td style={cell}>{order.customerId}</td>
+              <td style={cell}>${order.total}</td>
+              <td style={cell}>
+                <span
+                  style={{
+                    color: order.status === 'Completed' ? 'green' : 'orange',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  {order.status}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    /*<div style={{ padding: '2rem', fontFamily: 'Arial' }}>
       <h1>OrderHub UI</h1> <p><strong>Health:</strong> {health}</p>
       <button onClick={fetchOrders}>Refresh Orders</button> <ul>
         {orders.map((order) =>
         (<li key={order.id}> {order.id} - {order.customerId} - ${order.total} - {order.status}
-        </li>))} </ul> </div>);
+        </li>))} </ul> </div> */
+
+  );
 }
 export default App;
