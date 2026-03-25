@@ -81,7 +81,11 @@ function App() {
               <td style={cell}>
                 <span
                   style={{
-                    color: order.status === 'Completed' ? 'green' : 'orange',
+                    color:
+                      order.status === 'Completed' ? 'green'
+                        : order.status === 'Pending' ? 'orange'
+                          : order.status === 'Cancelled' ? 'red'
+                            : 'black',
                     fontWeight: 'bold',
                   }}
                 >
