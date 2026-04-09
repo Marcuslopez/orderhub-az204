@@ -10,10 +10,10 @@ export interface Order {
 @Injectable()
 export class OrdersService {
 private readonly orders: Order[] = [ 
-  { id: '1', customerId: 'cust-001', total: 150, status: 'Pending' }, 
-  { id: '2', customerId: 'cust-002', total: 220, status: 'Completed' },
-  { id: '7', customerId: 'cust-007', total: 245, status: 'Cancelled' }, 
-  { id: '5', customerId: 'cust-005', total: 375, status: 'Completed' },
+  { id: '001', customerId: 'cust-001', total: 150, status: 'Pending' }, 
+  { id: '002', customerId: 'cust-002', total: 220, status: 'Completed' },
+  { id: '004', customerId: 'cust-004', total: 245, status: 'Cancelled' }, 
+  { id: '005', customerId: 'cust-005', total: 375, status: 'Completed' },
   ];
 findAll(): Order[] {
      return this.orders; 

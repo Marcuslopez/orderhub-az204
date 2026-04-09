@@ -16,7 +16,7 @@ const response = await fetch(`${apiBaseUrl}/orders`);
 const data = await response.json();
 setOrders(data);
 if (data.length && !selectedOrderId) {
-setSelectedOrderId(data[0].id);
+setSelectedOrderId(selectedOrderId);
 }
 };
 const handleUpload = async () => {
@@ -38,8 +38,8 @@ if (!response.ok) {
 }
 
 const data = await response.json();
-const formattedOrderId = String(data.orderId).padStart(3, '0');
-setMessage(`Archivo cargado correctamente para la orden: order-${formattedOrderId}: ${data.fileName}`);
+
+setMessage(`Archivo cargado correctamente para la orden: order-${data.orderId}: ${data.fileName}`);
 } catch (error) {
 console.error(error);
 setMessage('Ocurrió un error al subir el archivo.');
