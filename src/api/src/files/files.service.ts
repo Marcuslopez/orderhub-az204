@@ -28,8 +28,17 @@ status: 'Uploaded',
 
 async listFiles() {
   const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING!;
-  const containerName =
-    process.env.AZURE_STORAGE_CONTAINER_NAME || 'attachments';
+  if (!connectionString) {
+  throw new InternalServerErrorException(
+    'AZURE_STORAGE_CONNECTION_STRING is not configured',
+  );
+}
+  const containerName = process.env.AZURE_STORAGE_CONTAINER_NAME || 'attachments';
+if (!containerName) {
+  throw new InternalServerErrorException(
+    'AZURE_STORAGE_CONTAINER_NAME is not configured',
+  );
+}
 
   const blobServiceClient =
     BlobServiceClient.fromConnectionString(connectionString);
