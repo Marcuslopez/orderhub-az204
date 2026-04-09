@@ -1,110 +1,80 @@
 import { useEffect, useState } from 'react';
-
 type Order = {
-  id: string;
-  customerId: string;
-  total: number;
-  status: string;
+id: string;
+customerId: string;
+total: number;
+status: string;
 };
 function App() {
-  const [health, setHealth] = useState<string>('Checking...');
-  const [orders, setOrders] = useState<Order[]>([]);
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-  const fetchHealth = async () => {
-    try {
-      const response = await fetch(`${apiBaseUrl}/health`);
-      const data = await response.json();
-      setHealth(data.ok ? 'API OK' : 'API Error');
-    }
-    catch {
-      setHealth('API unreachable');
-    }
-  };
-  const fetchOrders = async () => {
-    try {
-      const response = await fetch(`${apiBaseUrl}/orders`);
-      const data = await response.json(); setOrders(data);
-    }
-    catch (error) {
-      console.error(error);
-    }
-  };
-  useEffect(() => { fetchHealth(); fetchOrders(); }, []);
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+const [orders, setOrders] = useState<Order[]>([]);
+const [selectedOrderId, setSelectedOrderId] = useState<string>('');
+const [selectedFile, setSelectedFile] = useState<File | null>(null);
+const [message, setMessage] = useState<string>('');
+const fetchOrders = async () => {
+const response = await fetch(`${apiBaseUrl}/orders`);
+const data = await response.json();
+setOrders(data);
+if (data.length && !selectedOrderId) {
+setSelectedOrderId(data[0].id);
+}
+};
+const handleUpload = async () => {
+if (!selectedFile || !selectedOrderId) {
+setMessage('Debes seleccionar una orden y un archivo.');
+return;
+}
+const formData = new FormData();
+formData.append('file', selectedFile);
+formData.append('orderId', selectedOrderId);
+try {
+const response = await fetch(`${apiBaseUrl}/files`, {
+method: 'POST',
+body: formData,
+});
 
-  //Estilo de la grilla
-  const cellHeader: React.CSSProperties = {
-    border: '1px solid #ddd',
-    padding: '8px',
-    textAlign: 'left',
-    fontWeight: 'bold',
-  };
+if (!response.ok) {
+  throw new Error(`Error HTTP: ${response.status}`);
+}
 
-  const cell: React.CSSProperties = {
-    border: '1px solid #ddd',
-    padding: '8px',
-  };
+const data = await response.json();
 
-  return (
-    <div style={{ padding: '2rem', fontFamily: 'Arial' }}>
-      <h1>OrderHub UI</h1>
-
-      <p>
-        <strong>Health:</strong> {health}
-      </p>
-
-      <button onClick={fetchOrders} style={{ marginBottom: '1rem' }}>
-        Refresh Orders
-      </button>
-
-      <table
-        style={{
-          width: '100%',
-          borderCollapse: 'collapse',
-          marginTop: '1rem',
-        }}
-      >
-        <thead>
-          <tr style={{ backgroundColor: '#f4f4f4' }}>
-            <th style={cellHeader}>ID</th>
-            <th style={cellHeader}>Customer</th>
-            <th style={cellHeader}>Total</th>
-            <th style={cellHeader}>Status</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {orders.map((order) => (
-            <tr key={order.id}>
-              <td style={cell}>{order.id}</td>
-              <td style={cell}>{order.customerId}</td>
-              <td style={cell}>${order.total}</td>
-              <td style={cell}>
-                <span
-                  style={{
-                    color:
-                      order.status === 'Completed' ? 'green'
-                        : order.status === 'Pending' ? 'orange'
-                          : order.status === 'Cancelled' ? 'red'
-                            : 'black',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {order.status}
-                </span>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-
-    /*<div style={{ padding: '2rem', fontFamily: 'Arial' }}>
-      <h1>OrderHub UI</h1> <p><strong>Health:</strong> {health}</p>
-      <button onClick={fetchOrders}>Refresh Orders</button> <ul>
-        {orders.map((order) =>
-        (<li key={order.id}> {order.id} - {order.customerId} - ${order.total} - {order.status}
-        </li>))} </ul> </div> */
-
-  );
+setMessage(`Archivo cargado correctamente para la orden: ${data.orderId}: ${data.file}`);
+} catch (error) {
+console.error(error);
+setMessage('Ocurrió un error al subir el archivo.');
+}
+};
+useEffect(() => {
+fetchOrders();
+}, []);
+return (
+<div style={{ padding: '2rem', fontFamily: 'Arial' }}>
+<h1>OrderHub</h1>
+<h2>Órdenes</h2>
+<select
+value={selectedOrderId}
+onChange={(e) => setSelectedOrderId(e.target.value)}
+>
+{orders.map((order) => (
+<option key={order.id} value={order.id}>
+{order.id} - {order.customerId} - {order.status}
+</option>
+))}
+</select>
+<div style={{ marginTop: '2rem', padding: '1rem', border: '1px solid #ccc' }}>
+<h3>Adjuntos de la orden</h3>
+<p>Orden seleccionada: <strong>{selectedOrderId || 'Ninguna'}</strong></p>
+<input
+type="file"
+onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+/>
+<button onClick={handleUpload} style={{ marginLeft: '1rem' }}>
+Subir archivo
+</button>
+<p style={{ marginTop: '1rem' }}>{message}</p>
+</div>
+</div>
+);
 }
 export default App;
