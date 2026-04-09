@@ -38,8 +38,8 @@ if (!response.ok) {
 }
 
 const data = await response.json();
-
-setMessage(`Archivo cargado correctamente para la orden: ${data.orderId}: ${data.file}`);
+const formattedOrderId = String(data.orderId).padStart(3, '0');
+setMessage(`Archivo cargado correctamente para la orden: order-${formattedOrderId}: ${data.fileName}`);
 } catch (error) {
 console.error(error);
 setMessage('Ocurrió un error al subir el archivo.');
