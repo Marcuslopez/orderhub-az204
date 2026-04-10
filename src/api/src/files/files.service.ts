@@ -32,7 +32,7 @@ export class FilesService {
 
     return {
       orderId: safeOrderId,
-      fileName: file.originalname,
+      fileName: blobName.split('/').pop(),
       blobName,
       size: file.size,
       contentType: file.mimetype,
