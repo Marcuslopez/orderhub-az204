@@ -20,7 +20,10 @@ export class FilesService {
     const containerClient = blobServiceClient.getContainerClient(containerName);
 
     const safeOrderId = orderId || 'unassigned';
-    const blobName = `${safeOrderId}/${Date.now()}-${file.originalname}`;
+
+    const cleanFileName = file.originalname.replace(/\s+/g, '-');
+    const blobName = `${safeOrderId}/${Date.now()}-${cleanFileName}`;
+
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
     await blockBlobClient.uploadData(file.buffer, {
