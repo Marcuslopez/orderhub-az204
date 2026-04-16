@@ -50,7 +50,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'staging (app-orderhub-api-mramos/staging)'
+          app-name: 'app-orderhub-api-mramos/staging'          
           slot-name: 'staging'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B908F6BC28554D65BB65556F81E876CE }}
