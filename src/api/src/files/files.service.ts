@@ -45,7 +45,7 @@ export class FilesService {
 
     if (!connectionString) {
       throw new InternalServerErrorException(
-        'AZURE_STORAGE_CONNECTION_STRING is not configured.',
+        'AZURE_STORAGE_CONNECTION_STRING is not configured',
       );
     }
 
