@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Order } from './order.entity';
 
+/*
 export interface Order {
-     id: string; 
+     id: number; 
      customerId: string;
       total: number; 
       status: string;
@@ -18,29 +22,20 @@ private readonly orders: Order[] = [
 findAll(): Order[] {
      return this.orders; 
 }
+*/
+@Injectable()
+export class OrdersService {
+  constructor(
+    @InjectRepository(Order)
+    private readonly orderRepository: Repository<Order>,
+  ) {}
 
-create(order: Omit<Order, 'id'>): 
-Order { const newOrder: Order = { id: Date.now().toString(),
-     ...order,
-     }; 
-     this.orders.push(newOrder); 
-     return newOrder; 
-    }
-
-remove(id: string) {
-  const index = this.orders.findIndex(order => order.id === id);
-
-  if (index === -1) {
-    return { message: 'Order not found' };
+  create(orderDto: Partial<Order>) {
+    const order = this.orderRepository.create(orderDto);
+    return this.orderRepository.save(order);
   }
 
-  const deleted = this.orders[index];
-  this.orders.splice(index, 1);
-
-  return {
-    message: 'Order deleted',
-    order: deleted,
-  };
-}
-
+  findAll() {
+    return this.orderRepository.find();
+  }
 }

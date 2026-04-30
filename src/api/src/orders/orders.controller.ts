@@ -1,29 +1,18 @@
-
-import { Body, Controller,Delete, Get,Param, Post } from '@nestjs/common';
+import { Controller, Get, Post, Body } from '@nestjs/common';
 import { OrdersService } from './orders.service';
+import { Order } from './order.entity';
 
 @Controller('orders')
 export class OrdersController {
+  constructor(private readonly ordersService: OrdersService) {}
 
-    constructor(private readonly ordersService: OrdersService) {}
-    @Get() 
-    getOrders() 
-    { return this.ordersService.findAll(); 
+  @Post()
+  create(@Body() body: Partial<Order>) {
+    return this.ordersService.create(body);
+  }
 
-    }
-
-@Delete(':id')
-remove(@Param('id') id: string) {
-  return this.ordersService.remove(id);
-}
-
-@Post() 
-createOrder(
-     @Body() body: { customerId: string; total: number; status: string }, 
-    ) { 
-        return this.ordersService.create(body); 
-    }
-
-    
-
+  @Get()
+  findAll() {
+    return this.ordersService.findAll();
+  }
 }
