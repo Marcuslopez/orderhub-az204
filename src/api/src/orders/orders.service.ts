@@ -23,8 +23,6 @@ findAll(): Order[] {
      return this.orders; 
 }
 */
-
-
 @Injectable()
 export class OrdersService {
   constructor(
@@ -40,4 +38,8 @@ export class OrdersService {
   findAll() {
     return this.orderRepository.find();
   }
+
+  remove(id: number) {
+  return this.orderRepository.delete(id);
+}
 }
