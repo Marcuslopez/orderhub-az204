@@ -7,7 +7,7 @@ name: Build and deploy Node.js app to Azure Web App - app-orderhub-api-mramos
 on:
   push:
     branches:
-      - develop
+      - main
   workflow_dispatch:
 
 jobs:
@@ -52,6 +52,6 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'app-orderhub-api-mramos'
-          slot-name: 'staging'
+          slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EBFA425F42C849CCAEF35CE363D32458 }}
