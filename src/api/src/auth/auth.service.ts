@@ -1,26 +1,42 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
-  }
+  constructor(private readonly jwtService: JwtService) {}
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async login(email: string, password: string) {
+    const demoUser = {
+      id: 1,
+      email: 'admin@orderhub.com',
+      passwordHash: await bcrypt.hash('Admin123*', 10),
+      role: 'admin',
+    };
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
+    if (email !== demoUser.email) {
+      throw new UnauthorizedException('Credenciales inválidas');
+    }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
+    const passwordOk = await bcrypt.compare(password, demoUser.passwordHash);
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+    if (!passwordOk) {
+      throw new UnauthorizedException('Credenciales inválidas');
+    }
+
+    const payload = {
+      sub: demoUser.id,
+      email: demoUser.email,
+      role: demoUser.role,
+    };
+
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+      user: {
+        id: demoUser.id,
+        email: demoUser.email,
+        role: demoUser.role,
+      },
+    };
   }
 }
