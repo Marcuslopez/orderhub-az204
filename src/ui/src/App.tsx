@@ -1,11 +1,11 @@
 import { useAuth } from './auth/AuthContext';
 import { LoginPage } from './auth/LoginPage';
-import { OrderHubPage } from './orders/OrderHubPage';
+import { OrdersPage } from './orders/OrdersPage';
 
 function App() {
   const { user } = useAuth();
 
-  return user ? <OrderHubPage /> : <LoginPage />;
+  return user ? <OrdersPage /> : <LoginPage />;
 }
 
 export default App;

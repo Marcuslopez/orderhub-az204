@@ -1,7 +1,15 @@
-import { Controller, Get, Post,Delete,Param, Body  } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { Order } from './entities/order.entity';
-import { UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -14,8 +22,8 @@ export class OrdersController {
   @Post()
   @UseGuards(RolesGuard)
   @Roles('admin', 'operator')
-  create(@Body() body: Partial<Order>) {
-    return this.ordersService.create(body);
+  create(@Body() body: Partial<Order>, @Request() req) {
+    return this.ordersService.create(body, req.user);
   }
 
   @Get()
@@ -23,10 +31,8 @@ export class OrdersController {
     return this.ordersService.findAll();
   }
 
-@Delete(':id')
-remove(@Param('id') id: number) {
-  return this.ordersService.remove(id);
+  @Delete(':id')
+  remove(@Param('id') id: number) {
+    return this.ordersService.remove(Number(id));
+  }
 }
-
-}
-

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { apiRequest } from '../api/apiClient';
 import { useAuth } from '../auth/AuthContext';
+import OrderHistory from './OrderHistory';
 
 
 type Order = {
@@ -29,15 +30,81 @@ type OrderGridRow = {
   };
 };
 
-export function OrderHubPage() {
-   const { user, logout } = useAuth();
+export function OrdersPage() {
 
+  const [newCustomerId, setNewCustomerId] = useState('');
+  const [newTotal, setNewTotal] = useState('');
+  const [newStatus, setNewStatus] = useState('Pending');  
+
+/*  
+const handleCreateOrder = async () => {
+  try {
+    const createdOrder = await apiRequest('/orders', {
+      method: 'POST',
+      body: JSON.stringify({
+        customerId: newCustomerId,
+        total: Number(newTotal),
+        status: newStatus,
+      }),
+    });
+
+    setMessage(`Orden ${formatDisplayOrderId(createdOrder.id)} creada correctamente.`);
+
+    setNewCustomerId('');
+    setNewTotal('');
+    setNewStatus('Pending');
+
+  await loadGridData(String(createdOrder.id));
+  } catch (error) {
+    console.error(error);
+    setMessage('Ocurrió un error al crear la orden.');
+  }
+};
+*/
+const handleCreateOrder = async () => {
+  try {
+    const createdOrder = await apiRequest('/orders', {
+      method: 'POST',
+      body: JSON.stringify({
+        customerId: newCustomerId,
+        total: Number(newTotal),
+        status: newStatus,
+      }),
+    });
+
+    const createdOrderId = String(createdOrder.id);
+    const paddedId = formatDisplayOrderId(createdOrder.id);
+
+    const newGridRow: OrderGridRow = {
+      id: paddedId,
+      customerId: createdOrder.customerId,
+      total: createdOrder.total,
+      status: createdOrder.status,
+    };
+
+    setOrders((prev) => [...prev, createdOrder]);
+    setGridData((prev) => [...prev, newGridRow]);
+    setSelectedOrderId(createdOrderId);
+
+    setNewCustomerId('');
+    setNewTotal('');
+    setNewStatus('Pending');
+
+    setMessage(`Orden ${paddedId} creada correctamente.`);
+
+    await loadGridData(createdOrderId);
+  } catch (error) {
+    console.error(error);
+    setMessage('Ocurrió un error al crear la orden.');
+  }
+};
+  const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
+  const { user, logout } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [gridData, setGridData] = useState<OrderGridRow[]>([]);
   const [selectedOrderId, setSelectedOrderId] = useState<string>('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [message, setMessage] = useState<string>('');
-
   const formatOrderId = (id: string | number) => {
     return `order-${String(id).padStart(3, '0')}`;
   };
@@ -51,7 +118,7 @@ export function OrderHubPage() {
     return match ? match[1] : null;
   };
 
-  const loadGridData = async () => {
+  const loadGridData = async (orderIdToSelect?: string) => {
     try {
       const [ordersData, filesData]: [Order[], BlobFile[]] = await Promise.all([
         apiRequest('/orders'),
@@ -71,10 +138,17 @@ export function OrderHubPage() {
             name: fileName,
           });
         }
+
+        if (orderIdToSelect) {
+           setSelectedOrderId(orderIdToSelect);
+          } else if (ordersData.length > 0 && !selectedOrderId) {
+            setSelectedOrderId(String(ordersData[0].id));
+          }
+
       });
 
       const mergedData: OrderGridRow[] = ordersData.map((order) => {
-        const paddedId = formatDisplayOrderId(order.id);
+      const paddedId = formatDisplayOrderId(order.id);
 
         return {
           id: paddedId,
@@ -88,10 +162,12 @@ export function OrderHubPage() {
       setOrders(ordersData);
       setGridData(mergedData);
 
-      if (ordersData.length > 0 && !selectedOrderId) {
+      if (orderIdToSelect) {
+        setSelectedOrderId(orderIdToSelect);
+      } else if (ordersData.length > 0 && !selectedOrderId) {
         setSelectedOrderId(ordersData[0].id);
       }
-    } catch (error) {
+      } catch (error) {
       console.error(error);
       setMessage('Ocurrió un error al cargar órdenes y archivos.');
     }
@@ -127,7 +203,10 @@ export function OrderHubPage() {
       );
 
       setSelectedFile(null);
+
       await loadGridData();
+
+      setHistoryRefreshKey((prev) => prev + 1);
     } catch (error) {
       console.error(error);
       setMessage('Ocurrió un error al subir el archivo.');
@@ -159,10 +238,85 @@ export function OrderHubPage() {
             padding: '0.4rem 0.8rem',
             cursor: 'pointer',
     }}>Cerrar sesión</button>
-        <h1 style={{ color: '#f9fafb' }}>OrderHub</h1>
-        <h2 style={{ color: '#f9fafb' }}>Órdenes</h2>
+        <h1 style={{ color: '#f9fafb' }}>App OrderHub</h1>      
 
-      <select
+<div
+  style={{
+    marginTop: '2rem',
+    padding: '1.5rem',
+    border: '1px solid #374151',
+    borderRadius: '8px',
+    backgroundColor: '#111827',
+  }}
+>
+  <h3 style={{ color: '#f9fafb' }}>Crear nueva orden</h3>
+
+  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+    <input
+      placeholder="Customer ID"
+      value={newCustomerId}
+      onChange={(e) => setNewCustomerId(e.target.value)}
+      style={{
+        padding: '0.5rem',
+        backgroundColor: '#1f2937',
+        color: '#f9fafb',
+        border: '1px solid #374151',
+        borderRadius: '4px',
+      }}
+    />
+
+    <input
+      placeholder="Total"
+      type="number"
+      value={newTotal}
+      onChange={(e) => setNewTotal(e.target.value)}
+      style={{
+        padding: '0.5rem',
+        backgroundColor: '#1f2937',
+        color: '#f9fafb',
+        border: '1px solid #374151',
+        borderRadius: '4px',
+      }}
+    />
+    <select
+      value={newStatus}
+      onChange={(e) => setNewStatus(e.target.value)}
+      style={{
+        padding: '0.5rem',
+        backgroundColor: '#1f2937',
+        color: '#f9fafb',
+        border: '1px solid #374151',
+        borderRadius: '4px',
+      }}
+    >
+      <option value="Pending">Pending</option>
+      <option value="Completed">Completed</option>
+      <option value="Cancelled">Cancelled</option>
+    </select>
+
+    <button
+      onClick={handleCreateOrder}
+      style={{
+        backgroundColor: '#2563eb',
+        color: 'white',
+        border: 'none',
+        padding: '0.55rem 1rem',
+        cursor: 'pointer',
+        borderRadius: '4px',
+      }}
+    >
+      Crear orden
+    </button>
+  </div>
+</div>
+
+
+      <div style={{ marginTop: '2rem', padding: '1rem', border: '1px solid #374151' }}>
+      
+      <h3 style={{ color: '#f9fafb' }}>Adjunto a Ordenes</h3>
+
+      <h3 style={{ color: '#f9fafb' }}>Seleccione Orden:
+      <select 
         value={selectedOrderId}
         onChange={(e) => setSelectedOrderId(e.target.value)}
       >
@@ -172,9 +326,9 @@ export function OrderHubPage() {
           </option>
         ))}
       </select>
+     </h3>
 
-      <div style={{ marginTop: '2rem', padding: '1rem', border: '1px solid #374151' }}>
-        <h3 style={{ color: '#f9fafb' }}>Adjuntos de la orden</h3>
+        <h3 style={{ color: '#f9fafb' }}>___________________________________</h3>
         <p style={{ color: '#f9fafb' }}>
           Orden seleccionada:{' '}
           <strong>
@@ -199,7 +353,7 @@ export function OrderHubPage() {
           Subir archivo
         </button>
 
-        <p style={{ marginTop: '1rem' }}>{message}</p>
+        <p style={{ marginTop: '1rem', color: '#d1d5db'  }}>{message}</p>
       </div>
 
       <div style={{ marginTop: '2rem' }}>
@@ -273,6 +427,11 @@ export function OrderHubPage() {
           </tbody>
         </table>
       </div>
+      <OrderHistory
+       selectedOrderId={selectedOrderId}
+       refreshKey={historyRefreshKey}
+      />
     </div>
+    
   );
 }

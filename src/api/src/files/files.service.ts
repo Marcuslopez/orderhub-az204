@@ -5,29 +5,67 @@ import {
   generateBlobSASQueryParameters,
   StorageSharedKeyCredential,
 } from '@azure/storage-blob';
+import { SecretsService } from '../secrets/secrets.service';
 import 'multer';
+import { AuditService } from '../audit/audit.service';
+
 
 @Injectable()
 export class FilesService {
-  async uploadFile(file: Express.Multer.File, orderId?: string) {
-    const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING!;
-    const containerName =
-      process.env.AZURE_STORAGE_CONTAINER_NAME || 'attachmentsmramos';
+  constructor(private readonly secretsService: SecretsService,     
+  private readonly auditService: AuditService, 
+  ) {}
+
+  private async getStorageConfig() {
+    const connectionString = await this.secretsService.getSecret(
+      'azure-storage-connection-string',
+      'AZURE_STORAGE_CONNECTION_STRING',
+    );
+
+    const containerName = await this.secretsService.getSecret(
+      'azure-storage-container-name',
+      'AZURE_STORAGE_CONTAINER_NAME',
+    );
+
+    return {
+      connectionString,
+      containerName,
+    };
+  }
+
+    async uploadFile(file: Express.Multer.File,orderId?: string,user?: any,) {
+    const { connectionString, containerName } = await this.getStorageConfig();
 
     const blobServiceClient =
       BlobServiceClient.fromConnectionString(connectionString);
 
     const containerClient = blobServiceClient.getContainerClient(containerName);
 
+    await containerClient.createIfNotExists();
+
     const safeOrderId = orderId || 'unassigned';
 
     const cleanFileName = file.originalname.replace(/\s+/g, '-');
     const blobName = `${safeOrderId}/${safeOrderId}-${Date.now()}-${cleanFileName}`;
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+    
+    const auditOrderId = safeOrderId.replace('order-', '').replace(/^0+/, '');
 
     await blockBlobClient.uploadData(file.buffer, {
       blobHTTPHeaders: { blobContentType: file.mimetype },
     });
+
+await this.auditService.recordEvent({
+  orderId: String(auditOrderId),
+  type: 'FILE_UPLOADED',
+  userEmail: user?.email,
+  data: {
+    fileName: file.originalname,
+    blobName,
+    contentType: file.mimetype,
+    size: file.size,
+  },
+});
 
     return {
       orderId: safeOrderId,
@@ -40,17 +78,12 @@ export class FilesService {
     };
   }
 
+      
+
+
+
   async listFiles() {
-    const connectionString = process.env.AZURE_STORAGE_CONNECTION_STRING;
-
-    if (!connectionString) {
-      throw new InternalServerErrorException(
-        'AZURE_STORAGE_CONNECTION_STRING is not configured',
-      );
-    }
-
-    const containerName =
-      process.env.AZURE_STORAGE_CONTAINER_NAME || 'attachmentsmramos';
+    const { connectionString, containerName } = await this.getStorageConfig();
 
     const accountName = this.getConnectionStringValue(
       connectionString,
@@ -64,7 +97,7 @@ export class FilesService {
 
     if (!accountName || !accountKey) {
       throw new InternalServerErrorException(
-        'AccountName or AccountKey could not be extracted from AZURE_STORAGE_CONNECTION_STRING',
+        'AccountName or AccountKey could not be extracted from storage connection string',
       );
     }
 

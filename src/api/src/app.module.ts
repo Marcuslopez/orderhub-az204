@@ -7,6 +7,8 @@ import { HealthModule } from './health/health.module';
 import { FilesModule } from './files/files.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { SecretsModule } from './secrets/secrets.module';
+import { AuditModule } from './audit/audit.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { AuthModule } from './auth/auth.module';
     HealthModule,
     FilesModule,
     AuthModule,
+    SecretsModule,
+    AuditModule,
     
   ],
   controllers: [AppController],

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Order } from './entities/order.entity';
+import { AuditService } from '../audit/audit.service';
 
 /*
 export interface Order {
@@ -28,11 +29,25 @@ export class OrdersService {
   constructor(
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
+    private readonly auditService: AuditService,
   ) {}
-
-  create(orderDto: Partial<Order>) {
+  
+  async create(orderDto: Partial<Order>, user?: any) {
     const order = this.orderRepository.create(orderDto);
-    return this.orderRepository.save(order);
+    const savedOrder = await this.orderRepository.save(order);
+    
+   
+    await this.auditService.recordEvent({
+      orderId: String(savedOrder.id),      
+      type: 'ORDER_CREATED',
+      userEmail: user?.email,
+      data: {
+        customerId: savedOrder.customerId,
+        total: savedOrder.total,
+        status: savedOrder.status,
+      },
+    });
+    return savedOrder;
   }
 
   findAll() {
@@ -40,6 +55,6 @@ export class OrdersService {
   }
 
   remove(id: number) {
-  return this.orderRepository.delete(id);
-}
+    return this.orderRepository.delete(id);
+  }
 }

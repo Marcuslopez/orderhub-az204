@@ -1,10 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { SecretsService } from '../secrets/secrets.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly secretsService: SecretsService,
+  ) {}
 
   async login(email: string, password: string) {
     const demoUser = {
@@ -24,6 +28,11 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
+    const jwtSecret = await this.secretsService.getSecret(
+      'jwt-secret',
+      'JWT_SECRET',
+    );
+
     const payload = {
       sub: demoUser.id,
       email: demoUser.email,
@@ -31,7 +40,9 @@ export class AuthService {
     };
 
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: await this.jwtService.signAsync(payload, {
+        secret: jwtSecret,
+      }),
       user: {
         id: demoUser.id,
         email: demoUser.email,
