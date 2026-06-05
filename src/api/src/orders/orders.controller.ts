@@ -17,6 +17,7 @@ import { Roles } from '../auth/roles.decorator';
 
 
 @ApiBearerAuth('JWT-auth')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
