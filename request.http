@@ -10,12 +10,28 @@ Content-Type: application/json
 
 ###
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5Ab3JkZXJodWIuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgwNjczMDY0fQ.lTqta_ccG0MSMykBZpgO0VYsdRaustQP4FqKLwM5MMw
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5Ab3JkZXJodWIuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgwNzAxMDQxfQ.R0sDeK7GFodtZJ93dEspowb0kvOJYhOYhedb3rj7Eyk
 
 
+### Consulta ordenes
 GET https://app-orderhub-api-mramos-staging.azurewebsites.net/orders
 Authorization: Bearer {{token}}
 
-####
 
 
+### Crear Orden
+POST https://app-orderhub-api-mramos-staging.azurewebsites.net/orders
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "customerId": "cust-008",
+  "total": 120,
+  "status": "Pending"
+}
+
+### Obtener una orden por id
+DELETE https://app-orderhub-api-mramos-staging.azurewebsites.net/orders/6
+Authorization: Bearer {{token}}
+Content-Type: application/json
+ 
