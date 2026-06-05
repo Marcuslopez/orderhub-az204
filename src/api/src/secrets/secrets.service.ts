@@ -24,6 +24,8 @@ export class SecretsService {
     if (this.client) {
       const secret = await this.client.getSecret(secretName);
 
+  console.log(`Secret obtenido correctamente: ${secretName}`);      
+  
       if (!secret.value) {
         throw new Error(`Secret ${secretName} has no value`);
       }
@@ -41,4 +43,7 @@ export class SecretsService {
     this.cache.set(secretName, fallback);
     return fallback;
   }
+
+
+
 }
