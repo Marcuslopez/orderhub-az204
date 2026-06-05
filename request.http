@@ -1,0 +1,21 @@
+
+
+POST https://app-orderhub-api-mramos-staging.azurewebsites.net/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "admin@orderhub.com",
+  "password": "Admin123*"
+}  
+
+###
+
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5Ab3JkZXJodWIuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgwNjczMDY0fQ.lTqta_ccG0MSMykBZpgO0VYsdRaustQP4FqKLwM5MMw
+
+
+GET https://app-orderhub-api-mramos-staging.azurewebsites.net/orders
+Authorization: Bearer {{token}}
+
+####
+
+

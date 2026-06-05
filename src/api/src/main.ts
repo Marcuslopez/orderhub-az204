@@ -32,10 +32,20 @@ async function bootstrap() {
     allowedHeaders: 'Content-Type, Authorization', 
   });
 
-  const config = new DocumentBuilder() 
-  .setTitle('OrderHub API') 
-  .setDescription('API base para la Semana 1 de AZ-204') 
-  .setVersion('1.0') .build();
+const config = new DocumentBuilder()
+  .setTitle('OrderHub API')
+  .setDescription('API base para la Semana 1 de AZ-204')
+  .setVersion('1.0')
+  .addBearerAuth(
+    {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      description: 'Ingrese el JWT',
+    },
+    'JWT-auth',
+  )
+  .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
