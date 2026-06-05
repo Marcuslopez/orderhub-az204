@@ -11,7 +11,7 @@ import {
 import { OrdersService } from './orders.service';
 import { Order } from './entities/order.entity';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody  } from '@nestjs/swagger';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
@@ -21,6 +21,18 @@ import { Roles } from '../auth/roles.decorator';
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+
+  @ApiBody({
+  schema: {
+    type: 'object',
+    properties: {
+      customerId: { type: 'string', example: 'cust-100' },
+      total: { type: 'number', example: 250 },
+      status: { type: 'string', example: 'Pending' },
+    },
+    required: ['customerId', 'total'],
+  },
+})
   @Post()
   @UseGuards(RolesGuard)
   @Roles('admin', 'operator')
