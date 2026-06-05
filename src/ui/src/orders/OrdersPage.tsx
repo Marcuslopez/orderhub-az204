@@ -401,6 +401,7 @@ const handleCreateOrder = async () => {
                         row.status === 'Completed' ? 'green'
                         : row.status === 'Pending' ? 'orange'
                         : row.status === 'Cancelled' ? 'red'
+                        : row.status === 'Processed' ? 'pink'
                         : 'black',
                       fontWeight: 'bold',
                     }}

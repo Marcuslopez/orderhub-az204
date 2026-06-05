@@ -23,8 +23,10 @@
   "dependencies": {
     "@azure/cosmos": "^4.9.3",
     "@azure/identity": "^4.13.1",
+    "@azure/identity-broker": "^1.4.0",
     "@azure/keyvault-secrets": "^4.11.2",
     "@azure/storage-blob": "^12.31.0",
+    "@azure/storage-queue": "^12.29.0",
     "@nestjs/common": "^11.1.18",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.1.18",
@@ -38,6 +40,7 @@
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.1",
     "express": "^5.2.1",
+    "mssql": "^12.5.5",
     "multer": "^2.1.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

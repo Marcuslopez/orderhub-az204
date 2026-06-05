@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Order } from './entities/order.entity';
 import { AuditService } from '../audit/audit.service';
+import { QueueService } from '../queue/queue.service';
+
 
 /*
 export interface Order {
@@ -30,11 +32,13 @@ export class OrdersService {
     @InjectRepository(Order)
     private readonly orderRepository: Repository<Order>,
     private readonly auditService: AuditService,
+    private readonly queueService: QueueService,
   ) {}
   
   async create(orderDto: Partial<Order>, user?: any) {
     const order = this.orderRepository.create(orderDto);
     const savedOrder = await this.orderRepository.save(order);
+    await this.queueService.sendOrderCreated(savedOrder.id);
     
    
     await this.auditService.recordEvent({
