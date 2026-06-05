@@ -23,9 +23,8 @@ export class SecretsService {
 
     if (this.client) {
       const secret = await this.client.getSecret(secretName);
+   
 
-  console.log(`Secret obtenido correctamente: ${secretName}`);      
-  
       if (!secret.value) {
         throw new Error(`Secret ${secretName} has no value`);
       }
