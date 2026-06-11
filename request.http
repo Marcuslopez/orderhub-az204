@@ -10,7 +10,7 @@ Content-Type: application/json
 
 ###
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5Ab3JkZXJodWIuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgwNzAxMDQxfQ.R0sDeK7GFodtZJ93dEspowb0kvOJYhOYhedb3rj7Eyk
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5Ab3JkZXJodWIuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzgxMjEyMDA5fQ.MNNDTpUlCc3YoPrkNSoj73FGjpC5lYWPHMWHKk5RIl4
 
 
 ### Consulta ordenes
