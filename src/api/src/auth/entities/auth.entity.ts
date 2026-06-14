@@ -1,10 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'; 
 
-@Entity() export class User { 
+@Entity('users') export class User { 
     @PrimaryGeneratedColumn() id: number; 
     @Column({ unique: true }) email: string; 
     @Column() password: string; 
     @Column({ default: 'viewer' }) role: string; 
 }
-
-
